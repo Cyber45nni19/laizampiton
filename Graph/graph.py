@@ -1,11 +1,8 @@
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 from matplotlib import style
 import pandas as pd
 import numpy as np
 import csv
-from itertools import count
-import random
 
 style.use('ggplot')
 data = pd.read_csv('Example.csv', delimiter=',')
