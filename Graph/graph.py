@@ -14,9 +14,6 @@ x = df['NameOfAttack']
 y = df['NumberofTimes']
 
 
-# grabing the csv file then                                                                                                                                                                                                     i will need to replace it with and varible then append it to my list to the x axie and
-# by using a forloop to loop through the data to find the names
-
 #resize graph
 plt.figure(figsize=(15,6.5), dpi=100)
 
@@ -43,18 +40,3 @@ plt.legend(loc='upper right')
 # Show plot
 plt.tight_layout()
 plt.show()
-
-# att = []
-# y = []
-
-# index = count()
-# def animate(i):
-#     att.append(next(index))
-#     y.append(random.randint(0, 300))
-#
-#     plt.cla()
-#     plt.bar(att, y)
-#
-#
-# ani = FuncAnimation(plt.gcf(), animate, interval= 1000)
-# df = pd.read_csv('logfile.txt', delimiter='\t')
