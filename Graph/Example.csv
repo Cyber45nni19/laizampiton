@@ -1,0 +1,14 @@
+﻿NameOfAttack,NumberofTimes
+CSS,100
+SQL Injection,150
+RFE,50
+DoS,60
+Path Traversal,20
+File Inclusion,15
+robots.txt,50
+Credential Reuse,68
+RW,94
+Man-in-Middle,2
+Trojan Horse,183
+Virus,93
+Worm,300

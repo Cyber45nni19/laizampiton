@@ -1,0 +1,14 @@
+﻿NameOfAttack,NumberofTimes
+Cross-Site Scripting,100
+SQL Injection,150
+Remote File Execution,50
+Denial of Service,60
+Path Traversal,20
+File Inclusion,15
+robots.txt,50
+Credential Reuse,68
+Denial-of-Service,94
+Man-in-the-Middle,2
+Trojan Horse,183
+Virus,93
+Worm,800
