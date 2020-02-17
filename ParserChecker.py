@@ -1,16 +1,12 @@
 import re
 import csv
 import pandas as pd
-
+import numpy as np
 
 def parser(logfile): #Ensure that access log is in the same directory before runningc
     """This is a function that parses the log file and saves the relevant information to a CSV file"""
     with open('output.csv', 'w') as csvfile:
-        #Create Headers in the CSV file
-        header = ['IP', 'Data Size', 'Date Time', 'Status', 'URL']
-        writer = csv.writer(csvfile)
-        writer.writerow(header)
-        
+        joinedlist = list()
         #Use Regex to get the information needed line by line
         with open(logfile + '.log', 'r') as log_file:
             for line in log_file:
@@ -31,25 +27,41 @@ def parser(logfile): #Ensure that access log is in the same directory before run
                     #Leave column blank if Data size is empty
                     datasize.append('')
 
-                #Join the outputs of Regex into one list and write it as a row into the CSV file
-                joinedlist = ip + datasize + datetime + status + url
-                writer.writerow(joinedlist)
+                #Join the outputs of Regex into one list to use in dataframe
+                joinedlist.append(ip + datasize + datetime + status + url)
 
-def sqlinjectionchecker(filename):
+        df = pd.DataFrame(joinedlist, columns=['IP', 'Data Size', 'Date Time', 'Status', 'URL'])
+        return df
+
+def attackchecker(df, dict):
     '''This function searches the csvfile for any columns that contain the specified string and output them'''
-    df = pd.read_csv(filename+'.csv')
+    #Search for attacks that the user specified
+    sqlinjectstring = lfistring = rfistring = xssstring = list()
+    #Search if URL contains keywords
+    if dict['sql'] == 1:
+        sqlinjectstring = ['union%20select', '%27', "' or 1=1--"]
 
-    #Add keywords filter her
-    stringtofind = ['union\%20select', '/etc/passwd']
+    if dict['lfi'] == 1:
+        lfistring = ['\/\.\.','/etc/passwd','/etc/issue','proc/version','etc/profile','etc/passwd','etc/passwd','etc/shadow','root/.bash_history','var/log/dmessage','var/mail/root','var/spool/cron/crontabs/root']
 
+    if dict['rfi'] == 1:
+        rfistring = ['$_post', 'include\(', 'page\=']
+
+    if dict['xss'] == 1:
+        xssstring = ['<script>','%3cscript%3','&title=','javascript:','onerror\=','onload\=','%3c','<']
+
+
+    stringtofind = sqlinjectstring+lfistring+rfistring+xssstring
+    print stringtofind
     #Find specified string in the Words column and show them
     export = df[df["URL"].str.lower().str.contains('|'.join(stringtofind), na=False)]
-
+    successfulcode = export[export['Status'] == '200']
+    redirectedcode = export[export['Status'] == '301']
     #Filter attacks by Status Codes 2XX  and 3XX
-    successfulcode = export[(export.Status >= 200) & (export.Status <= 299)]
-    redirectedcode = export[(export.Status >= 300) & (export.Status <= 399)]
-    print 'SQL Injection: %d Attacks Successful and %d Attempted Attacks redirected' %(successfulcode.shape[0],redirectedcode.shape[0])
+    print 'Results: %d Attacks Successful and %d Attempted Attacks redirected' %(successfulcode.shape[0],redirectedcode.shape[0])
 
-    #Export to CSV
-    export.to_csv(r'export_dataframe.csv', index=None, header=True)
+    # Export to CSV
+    export.to_csv(r'export_dataframe.csv', index=None, header=Trute)
 
+mydict = {'xss':1, 'sql':0, 'rfi':0, 'lfi':0}
+attackchecker(parser('access copy'), mydict)
