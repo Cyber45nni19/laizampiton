@@ -1,7 +1,5 @@
 import re
-import csv
 import pandas as pd
-import numpy as np
 
 def parser(logfile): #Ensure that access log is in the same directory before runningc
     """This is a function that parses the log file and saves the relevant information to a CSV file"""
@@ -51,7 +49,9 @@ def attackchecker(df,savepath,dict):
 
 
     stringtofind = sqlinjectstring+lfistring+rfistring+xssstring
-    print stringtofind
+    if len(stringtofind) == 0:
+        print 'No attacks selected! Please select the type of attack to search for'
+        exit()
     #Find specified string in the Words column and show them
     export = df[df["URL"].str.lower().str.contains('|'.join(stringtofind), na=False)]
     successfulcode = export[export['Status'] == '200']
@@ -61,5 +61,27 @@ def attackchecker(df,savepath,dict):
 
     # Export to CSV
     print "exported to " + str(savepath)
-    export.to_csv(savepath + '/export_dataframe.csv', index=None, header=True)
+    export.to_csv(savepath + '/Suspicious_Actions.csv', index=None, header=True)
 
+    return export
+
+def showflaggedIP(parserdf, export):
+    if len(export.IP.unique()) == 0: #Check if there are any IPs
+        print 'Empty'
+    else: #If there are IPs
+        IPcounter = list()# Create a dictionary to store how many times an IP made a connection
+        flagIP = export.IP.unique() #Find all the unique IPs and store it in a list
+
+        for n in range(len(flagIP)):
+            IPactions = parserdf[parserdf['IP'] == flagIP[n]]
+            IPcounter.append([flagIP[n], IPactions.shape[0]])
+            if n > 0:
+                IPactions.to_csv('FlaggedIPActions.csv', mode='a', header=False, index=None)
+            else:
+                IPactions.to_csv('FlaggedIPActions.csv', mode='w', header=False, index=None)
+
+        return IPcounter
+mydict = {'xss':1, 'sql':1, 'rfi':1, 'lfi':1}
+parserdf = parser('accessbig.log')
+export = attackchecker(parserdf,'/Users/waiqun/PycharmProjects/1002Proj', mydict)
+showflaggedIP(parserdf, export)
