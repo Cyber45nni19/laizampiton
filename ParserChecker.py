@@ -7,7 +7,7 @@ def parser(logfile): #Ensure that access log is in the same directory before run
     """This is a function that parses the log file and saves the relevant information to a CSV file"""
     joinedlist = list()
     #Use Regex to get the information needed line by line
-    with open(logfile + '.log', 'r') as log_file:
+    with open(logfile, 'r') as log_file:
         for line in log_file:
             ipregex = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
             datasizenumregex = r'(?<=\d ).\d{1,5}(?= ")'
@@ -32,7 +32,7 @@ def parser(logfile): #Ensure that access log is in the same directory before run
     df = pd.DataFrame(joinedlist, columns=['IP', 'Data Size', 'Date Time', 'Status', 'URL'])
     return df
 
-def attackchecker(df, dict):
+def attackchecker(df,savepath,dict):
     '''This function searches the csvfile for any columns that contain the specified string and output them'''
     #Search for attacks that the user specified
     sqlinjectstring = lfistring = rfistring = xssstring = list()
@@ -60,7 +60,6 @@ def attackchecker(df, dict):
     print 'Results: %d Attacks Successful and %d Attempted Attacks redirected' %(successfulcode.shape[0],redirectedcode.shape[0])
 
     # Export to CSV
-    export.to_csv(r'export_dataframe.csv', index=None, header=True)
+    print "exported to " + str(savepath)
+    export.to_csv(savepath + '/export_dataframe.csv', index=None, header=True)
 
-mydict = {'xss':1, 'sql':0, 'rfi':0, 'lfi':0}
-attackchecker(parser('accesssmall'), mydict)

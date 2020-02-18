@@ -1,13 +1,15 @@
-import Tkinter, ttk, tkFileDialog
+import Tkinter, ttk, tkFileDialog, os
+from ParserChecker import *
 
 # Variable for the access log
 logpath = ""
 
-# Variable for the location to export log file (Default location is as follows)
-savepath = "C:/"
+# Variable for the location to export log file
+savepath = ""
 
 # Variable to know if a log has been selected
 selected = False
+selected2 = False
 
 # GUI Window.
 window = Tkinter.Tk()
@@ -26,8 +28,7 @@ button_frame.pack(side="bottom", fill="x", expand=False)
 # Function to browse logs when clicked
 def open():
     global selected
-    window.filename = tkFileDialog.askopenfilename(initialdir="C:/", title="Select Access Log",
-                                                   filetypes=(('text files', 'txt'),))
+    window.filename = tkFileDialog.askopenfilename(initialdir="C:/", title="Select Access Log")
     window.label = ttk.Label(Pathnamelabel, text="")
     if window.filename != "":
         Pathnamelabel.configure(text=window.filename)
@@ -48,12 +49,15 @@ Pathnamelabel.pack()
 
 # Function to allow user to choose where to save the exports, default is C:\\
 def save():
+    global selected2
     window.path = tkFileDialog.askdirectory()
     window.label2 = ttk.Label(Savenamelabel, text="")
     if window.path != "":
         Savenamelabel.configure(text=window.path)
+        selected2 = True
     else:
-        Savenamelabel.configure(text=savepath)
+        Savenamelabel.configure(text="No export location selected!")
+        selected2 = False
 
 
 # Button to choose save path
@@ -61,7 +65,7 @@ savebutton = Tkinter.Button(top_frame, text="Choose directory of export", comman
 savebutton.pack()
 
 # Label to indicate what save location has been selected
-Savenamelabel = Tkinter.Label(top_frame, text=savepath, pady=10)
+Savenamelabel = Tkinter.Label(top_frame, text="No export location", pady=10)
 Savenamelabel.pack()
 
 # Variable to know what has been selected in checkbox
@@ -78,7 +82,7 @@ xss = Tkinter.IntVar()
 xss.set(0)
 
 # Dictionary for function
-dict = {'sql': 0, 'lfi': 0, 'rfi': 0, 'xss': 0}
+dict = {'sql': 0, 'lfi': 0, 'rfi': 0, 'xss': 1}
 
 # Checkbox
 checkboxlabel = Tkinter.Label(top_frame, text="Scan for:")
@@ -108,8 +112,21 @@ def clicked():
     path = Pathnamelabel.cget("text")
     save = Savenamelabel.cget("text")
 
+    # assign checkbox values to dic
+    dict['sql'] = sql.get()
+    dict['lfi'] = lfi.get()
+    dict['rfi'] = rfi.get()
+    dict['xss'] = xss.get()
+
+    atleastone = sum(dict.itervalues())
+
+    print "How many selected? " + str(atleastone)
+    print "which options? " + str(dict)
+
+    format = path.endswith('.log')
+    print "Correct format?" + str(path.endswith('.log'))
     # if valid and got selected
-    if selected == True and path.endswith('.txt'):
+    if selected == True and selected2 == True and format == True and atleastone >= 1:
         logpath = path
         isclicked = True
     else:
@@ -118,19 +135,19 @@ def clicked():
     # assign the save location to the variable
     savepath = save
 
-    # assign checkbox values to dic
-    dict['sql'] = sql.get()
-    dict['lfi'] = lfi.get()
-    dict['rfi'] = rfi.get()
-    dict['xss'] = xss.get()
-
-    print "which options? " + str(dict)
-
     print "Analyzed is clicked, proceed to analyze? : " + str(isclicked)
     print "Got log file selected already? : " + str(selected)
+    print "Got save location selected already? : " + str(selected2)
 
-    print "Final logpath : " + logpath
-    print "Final Export Directory : " + savepath
+    print "Final logpath : " + str(logpath)
+    print "Final Export Directory : " + str(savepath)
+
+
+
+    if isclicked == True:
+        print "Running!"
+        attackchecker(parser(logpath), savepath, dict)
+        statuslabel.configure(text="Completed!")
 
 
 # Analyze button
@@ -142,8 +159,6 @@ Analyze.grid(row=1, column=2)
 statuslabel = Tkinter.Label(top_frame, text="Software not analyzing")
 statuslabel.pack(side="bottom")
 
-# If isclicked True > run the main to analyze the log file
-
-#Dictionary dict to pass on to function
 
 window.mainloop()
+
