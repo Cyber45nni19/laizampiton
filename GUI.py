@@ -1,5 +1,6 @@
 import Tkinter, ttk, tkFileDialog
 from ParserChecker import *
+from Hash import *
 import threading
 import time
 import random
@@ -88,8 +89,24 @@ def clicked():
 
 
     if isclicked == True:
+        print "Scanning"
         export = attackchecker(parser(logpath), savepath, dict)
         showflaggedIP(parser(logpath), export)
+
+        print "Hashing"
+        filetohash = savepath + '/Suspicious_Actions.csv'
+        filetohash2 = savepath + '/FlaggedIPActions.csv'
+        txt1 = hashing(filetohash)
+        txt2 = hashing(filetohash2)
+
+        text_file1 = open(savepath + "/MD5 of Suspicious_Actions.txt", "w")
+        text_file1.write(txt1)
+        text_file1.close()
+
+        text_file2 = open(savepath + "/MD5 of FlaggedIPActions.txt", "w")
+        text_file2.write(txt2)
+        text_file2.close()
+
         statuslabel.configure(text="Completed!")
 
 
