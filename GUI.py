@@ -1,9 +1,7 @@
 import Tkinter, ttk, tkFileDialog
 from ParserChecker import *
 from Hash import *
-import threading
-import time
-import random
+from Graph import *
 
 # Variable for the access log
 logpath = ""
@@ -91,7 +89,7 @@ def clicked():
     if isclicked == True:
         print "Scanning"
         export = attackchecker(parser(logpath), savepath, dict)
-        showflaggedIP(parser(logpath), export)
+        mylist = showflaggedIP(parser(logpath), export)
 
         print "Hashing"
         filetohash = savepath + '/Suspicious_Actions.csv'
@@ -109,6 +107,8 @@ def clicked():
 
         statuslabel.configure(text="Completed!")
 
+        print "Plotting Graph"
+        plotgraph(mylist)
 
 # GUI Window.
 window = Tkinter.Tk()
