@@ -1,5 +1,8 @@
-import Tkinter, ttk, tkFileDialog, os
+import Tkinter, ttk, tkFileDialog
 from ParserChecker import *
+import threading
+import time
+import random
 
 # Variable for the access log
 logpath = ""
@@ -10,6 +13,85 @@ savepath = ""
 # Variable to know if a log has been selected
 selected = False
 selected2 = False
+
+
+
+# Function to browse logs when clicked
+def selectlog():
+    global selected
+    window.filename = tkFileDialog.askopenfilename(initialdir="C:/", title="Select Access Log")
+    window.label = ttk.Label(Pathnamelabel, text="")
+    if window.filename != "":
+        Pathnamelabel.configure(text=window.filename)
+        selected = True
+    else:
+        Pathnamelabel.configure(text="No logs selected!")
+        selected = False
+
+
+# Function to allow user to choose where to save the exports, default is C:\\
+def save():
+    global selected2
+    window.path = tkFileDialog.askdirectory()
+    window.label2 = ttk.Label(Savenamelabel, text="")
+    if window.path != "":
+        Savenamelabel.configure(text=window.path)
+        selected2 = True
+    else:
+        Savenamelabel.configure(text="No export location selected!")
+        selected2 = False
+
+
+# If analyzed button is clicked, the path of the log file is put into a variable so it can be analyzed
+isclicked = False
+
+
+def clicked():
+    global isclicked
+    global logpath
+    global savepath
+
+    path = Pathnamelabel.cget("text")
+    save = Savenamelabel.cget("text")
+
+    # assign checkbox values to dic
+    dict['sql'] = sql.get()
+    dict['lfi'] = lfi.get()
+    dict['rfi'] = rfi.get()
+    dict['xss'] = xss.get()
+
+    atleastone = sum(dict.itervalues())
+
+    print "How many selected? " + str(atleastone)
+    print "which options? " + str(dict)
+
+    format = path.endswith('.log')
+    print "Correct format?" + str(path.endswith('.log'))
+    # if valid and got selected
+    if selected == True and selected2 == True and format == True and atleastone >= 1:
+        logpath = path
+        isclicked = True
+    else:
+        isclicked = False
+        statuslabel.configure(text="There is an invalid setting!")
+
+    # assign the save location to the variable
+    savepath = save
+
+    print "Analyzed is clicked, proceed to analyze? : " + str(isclicked)
+    print "Got log file selected already? : " + str(selected)
+    print "Got save location selected already? : " + str(selected2)
+
+    print "Final logpath : " + str(logpath)
+    print "Final Export Directory : " + str(savepath)
+
+
+
+    if isclicked == True:
+        export = attackchecker(parser(logpath), savepath, dict)
+        showflaggedIP(parser(logpath), export)
+        statuslabel.configure(text="Completed!")
+
 
 # GUI Window.
 window = Tkinter.Tk()
@@ -25,39 +107,13 @@ button_frame = Tkinter.Frame(window)
 button_frame.pack(side="bottom", fill="x", expand=False)
 
 
-# Function to browse logs when clicked
-def open():
-    global selected
-    window.filename = tkFileDialog.askopenfilename(initialdir="C:/", title="Select Access Log")
-    window.label = ttk.Label(Pathnamelabel, text="")
-    if window.filename != "":
-        Pathnamelabel.configure(text=window.filename)
-        selected = True
-    else:
-        Pathnamelabel.configure(text="No logs selected!")
-        selected = False
-
-
 # Button to find logs
-logbutton = Tkinter.Button(top_frame, text="Browse access log", command=open)
+logbutton = Tkinter.Button(top_frame, text="Browse access log", command=selectlog)
 logbutton.pack()
 
 # Label to indicate what log has been selected
 Pathnamelabel = Tkinter.Label(top_frame, text="No Access log selected yet", pady=10)
 Pathnamelabel.pack()
-
-
-# Function to allow user to choose where to save the exports, default is C:\\
-def save():
-    global selected2
-    window.path = tkFileDialog.askdirectory()
-    window.label2 = ttk.Label(Savenamelabel, text="")
-    if window.path != "":
-        Savenamelabel.configure(text=window.path)
-        selected2 = True
-    else:
-        Savenamelabel.configure(text="No export location selected!")
-        selected2 = False
 
 
 # Button to choose save path
@@ -100,54 +156,6 @@ rfic.pack()
 xssc = Tkinter.Checkbutton(window, text="XSS", variable=xss)
 xssc.pack()
 
-# If analyzed button is clicked, the path of the log file is put into a variable so it can be analyzed
-isclicked = False
-
-
-def clicked():
-    global isclicked
-    global logpath
-    global savepath
-
-    path = Pathnamelabel.cget("text")
-    save = Savenamelabel.cget("text")
-
-    # assign checkbox values to dic
-    dict['sql'] = sql.get()
-    dict['lfi'] = lfi.get()
-    dict['rfi'] = rfi.get()
-    dict['xss'] = xss.get()
-
-    atleastone = sum(dict.itervalues())
-
-    print "How many selected? " + str(atleastone)
-    print "which options? " + str(dict)
-
-    format = path.endswith('.log')
-    print "Correct format?" + str(path.endswith('.log'))
-    # if valid and got selected
-    if selected == True and selected2 == True and format == True and atleastone >= 1:
-        logpath = path
-        isclicked = True
-    else:
-        isclicked = False
-
-    # assign the save location to the variable
-    savepath = save
-
-    print "Analyzed is clicked, proceed to analyze? : " + str(isclicked)
-    print "Got log file selected already? : " + str(selected)
-    print "Got save location selected already? : " + str(selected2)
-
-    print "Final logpath : " + str(logpath)
-    print "Final Export Directory : " + str(savepath)
-
-
-
-    if isclicked == True:
-        print "Running!"
-        attackchecker(parser(logpath), savepath, dict)
-        statuslabel.configure(text="Completed!")
 
 
 # Analyze button
@@ -156,9 +164,10 @@ button_frame.grid_columnconfigure(0, weight=1)
 Analyze.grid(row=1, column=2)
 
 # Status to inform user if analyzing or not
-statuslabel = Tkinter.Label(top_frame, text="Software not analyzing")
+statuslabel = Tkinter.Label(top_frame, text="Configure settings")
 statuslabel.pack(side="bottom")
 
 
 window.mainloop()
+
 

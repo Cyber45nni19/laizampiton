@@ -81,7 +81,3 @@ def showflaggedIP(parserdf, export):
                 IPactions.to_csv('FlaggedIPActions.csv', mode='w', header=False, index=None)
 
         return IPcounter
-mydict = {'xss':1, 'sql':1, 'rfi':1, 'lfi':1}
-parserdf = parser('accessbig.log')
-export = attackchecker(parserdf,'/Users/waiqun/PycharmProjects/1002Proj', mydict)
-showflaggedIP(parserdf, export)
