@@ -26,7 +26,7 @@ def plotgraph(thelist):
     plt.yticks(np.arange(0, max(yaxis), freq))
     #
     # Adding Title to the graph
-    plt.title('Data Analyze', fontdict={'fontname': 'comic Sans MS', 'fontsize': 20})
+    plt.title('Connections made', fontdict={'fontname': 'comic Sans MS', 'fontsize': 20})
 
     # #Adding label to the graph on the X axis and Y axis
     plt.xlabel('Flagged IP')
