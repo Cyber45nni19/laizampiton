@@ -8,7 +8,7 @@ def parser(logfile): #Ensure that access log is in the same directory before run
     with open(logfile, 'r') as log_file:
         for line in log_file:
             ipregex = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
-            datasizenumregex = r'(?<=\d ).\d{1,5}(?= ")'
+            datasizenumregex = r'(?<=\d )\d{1,5}(?=\s)'
             statusregex = r'(?<=" ).\d{1,3}(?= )'
             datetimeregex = r'\d{2}/\w\w\w/\d{4}:\d{2}:\d{2}:\d{2} \+\d{4}'
             wordsregex = r'(?<= ")(.*)(?= HTTP/)'
