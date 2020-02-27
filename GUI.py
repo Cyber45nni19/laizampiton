@@ -155,7 +155,7 @@ xss = Tkinter.IntVar()
 xss.set(0)
 
 # Dictionary for function
-dict = {'sql': 0, 'lfi': 0, 'rfi': 0, 'xss': 1}
+dict = {'sql': 0, 'lfi': 0, 'rfi': 0, 'xss': 0}
 
 # Checkbox
 checkboxlabel = Tkinter.Label(top_frame, text="Scan for:")
