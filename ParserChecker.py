@@ -65,7 +65,7 @@ def attackchecker(df,savepath,dict):
 
     return export
 
-def showflaggedIP(parserdf, export):
+def showflaggedIP(parserdf, export, savepath):
     if len(export.IP.unique()) == 0: #Check if there are any IPs
         print 'Empty'
     else: #If there are IPs
@@ -76,8 +76,8 @@ def showflaggedIP(parserdf, export):
             IPactions = parserdf[parserdf['IP'] == flagIP[n]]
             IPcounter.append([flagIP[n], IPactions.shape[0]])
             if n > 0:
-                IPactions.to_csv('FlaggedIPActions.csv', mode='a', header=False, index=None)
+                IPactions.to_csv(savepath + '/FlaggedIPActions.csv', mode='a', header=False, index=None)
             else:
-                IPactions.to_csv('FlaggedIPActions.csv', mode='w', header=False, index=None)
+                IPactions.to_csv(savepath + '/FlaggedIPActions.csv', mode='w', header=False, index=None)
 
         return IPcounter

@@ -89,7 +89,7 @@ def clicked():
     if isclicked == True:
         print "Scanning"
         export = attackchecker(parser(logpath), savepath, dict)
-        mylist = showflaggedIP(parser(logpath), export)
+        mylist = showflaggedIP(parser(logpath), export, savepath)
 
         print "Hashing"
         filetohash = savepath + '/Suspicious_Actions.csv'
@@ -186,5 +186,3 @@ statuslabel.pack(side="bottom")
 
 
 window.mainloop()
-
-
