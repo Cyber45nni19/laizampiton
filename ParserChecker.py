@@ -1,7 +1,7 @@
 import re
 import pandas as pd
 
-def parser(logfile): #Ensure that access log is in the same directory before runningc
+def parser(logfile): #Ensure that access log is in the same directory before running
     """This is a function that parses the log file and saves the relevant information to a CSV file"""
     joinedlist = list()
     #Use Regex to get the information needed line by line
